@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useOrderStore, type CartItem } from '../store/useOrderStore';
 
 // Use placeholder images from Unsplash instead of missing local images
 const menuData = [
@@ -23,100 +24,43 @@ const menuData = [
   },
 ];
 
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
 const MenuPage: React.FC = () => {
   const navigate = useNavigate();
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [showNotification, setShowNotification] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const {
+    cart,
+    addToCart,
+    removeFromCart,
+    getTotalPrice,
+    showPaymentModal,
+    setShowPaymentModal,
+    showNotification,
+    setShowNotification,
+    loadFromStorage,
+    saveCartToStorage,
+    processPayment,
+  } = useOrderStore();
 
   // Load cart from localStorage on component mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Error loading cart:', error);
-      }
-    }
-  }, []);
+    loadFromStorage();
+  }, [loadFromStorage]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const addToCart = (item: { id: number; name: string; price: number }) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prevCart, { ...item, quantity: 1 }];
-      }
-    });
-  };
-
-  const removeFromCart = (itemId: number) => {
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === itemId);
-      if (existingItem && existingItem.quantity > 1) {
-        return prevCart.map(item =>
-          item.id === itemId
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
-        );
-      } else {
-        return prevCart.filter(item => item.id !== itemId);
-      }
-    });
-  };
-
-  const getTotalPrice = () => {
-    return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
+    saveCartToStorage();
+  }, [cart, saveCartToStorage]);
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
     setShowPaymentModal(true);
   };
 
-  const processPayment = () => {
-    // Save order to localStorage
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const newOrder = {
-      id: Date.now(),
-      items: cart,
-      total: getTotalPrice(),
-      date: new Date().toISOString(),
-      status: 'pending'
-    };
-    orders.push(newOrder);
-    localStorage.setItem('orders', JSON.stringify(orders));
-    
-    // Clear cart from localStorage
-    localStorage.removeItem('cart');
-    
-    // Close payment modal
+  const onProcessPayment = () => {
+    const order = processPayment();
+    if (!order) return;
     setShowPaymentModal(false);
-    
-    // Show success notification
     setShowNotification(true);
-    
-    // Clear cart and navigate to orders after a short delay
     setTimeout(() => {
-      setCart([]);
       setShowNotification(false);
       navigate('/orders');
     }, 1500);
@@ -309,7 +253,7 @@ const MenuPage: React.FC = () => {
             <p>Total Amount: ${getTotalPrice().toFixed(2)}</p>
             <p>Payment Method: (Mock Payment)</p>
             <button 
-              onClick={processPayment}
+                onClick={onProcessPayment}
               style={{ width: '100%', background: 'var(--accent)', color: 'white', padding: '0.8rem 1.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '1rem', marginTop: '1rem' }}
             >
               Process Payment

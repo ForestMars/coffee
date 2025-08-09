@@ -1,43 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-interface Order {
-  id: number;
-  items: OrderItem[];
-  total: number;
-  date: string;
-  status: 'pending' | 'completed' | 'cancelled';
-}
+import { useOrderStore, type Order } from '../store/useOrderStore';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const { orders, loadOrders, updateOrderStatus, deleteOrder } = useOrderStore();
 
   useEffect(() => {
-    const savedOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    setOrders(savedOrders);
-  }, []);
-
-  const updateOrderStatus = (orderId: number, newStatus: Order['status']) => {
-    const updatedOrders = orders.map(order =>
-      order.id === orderId ? { ...order, status: newStatus } : order
-    );
-    setOrders(updatedOrders);
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
-  };
-
-  const deleteOrder = (orderId: number) => {
-    const updatedOrders = orders.filter(order => order.id !== orderId);
-    setOrders(updatedOrders);
-    localStorage.setItem('orders', JSON.stringify(updatedOrders));
-  };
+    loadOrders();
+  }, [loadOrders]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();

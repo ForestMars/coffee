@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 
-// Polyfill for TextEncoder (needed for react-router-dom in tests)
-global.TextEncoder = require('util').TextEncoder;
-global.TextDecoder = require('util').TextDecoder; 
+// Polyfill for TextEncoder/TextDecoder in Jest environment
+import { TextEncoder, TextDecoder } from 'util';
+// @ts-expect-error - global in Jest
+global.TextEncoder = TextEncoder as unknown as typeof globalThis.TextEncoder;
+// @ts-expect-error - global in Jest
+global.TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder;
