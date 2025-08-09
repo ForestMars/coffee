@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useOrderStore, type CartItem } from '../store/useOrderStore';
+import { useOrderStore } from '../store/useOrderStore';
 
 // Use placeholder images from Unsplash instead of missing local images
 const menuData = [
