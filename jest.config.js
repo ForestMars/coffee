@@ -1,30 +1,20 @@
-import { createDefaultPreset } from "ts-jest";
-
-const tsJestTransformCfg = createDefaultPreset().transform;
-
 /** @type {import('jest').Config} */
 export default {
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
+  preset: 'ts-jest/presets/default-esm',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   transform: {
-    ...tsJestTransformCfg,
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
         useESM: true,
-        tsconfig: {
-          extends: './tsconfig.app.json',
-          compilerOptions: {
-            esModuleInterop: true,
-            jsx: 'react-jsx',
-          },
-        },
+        tsconfig: '<rootDir>/tsconfig.jest.json',
       },
     ],
   },
-  extensionsToTreatAsEsm: [".ts", ".tsx"],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   moduleNameMapper: {
     '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
