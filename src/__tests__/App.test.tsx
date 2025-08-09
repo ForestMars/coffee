@@ -31,7 +31,10 @@ describe('Coffee Shop App - Core Functionality', () => {
   });
 
   it('renders the menu page and menu items', () => {
-    render(<App router={MemoryRouter} />, { wrapper: ({ children }) => <MemoryRouter initialEntries={["/menu"]}>{children}</MemoryRouter> });
+    const TestRouter: React.ComponentType<{ children: React.ReactNode }> = ({ children }) => (
+      <MemoryRouter initialEntries={["/menu"]}>{children}</MemoryRouter>
+    );
+    render(<App router={TestRouter} />);
     expect(screen.getByText('Menu')).toBeInTheDocument();
     expect(screen.getByText('Coffee')).toBeInTheDocument();
     expect(screen.getByText('Tea')).toBeInTheDocument();
