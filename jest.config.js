@@ -8,12 +8,23 @@ export default {
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   transform: {
     ...tsJestTransformCfg,
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: {
+          extends: './tsconfig.app.json',
+          compilerOptions: {
+            esModuleInterop: true,
+            jsx: 'react-jsx',
+          },
+        },
+      },
+    ],
   },
   extensionsToTreatAsEsm: [".ts", ".tsx"],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
+  moduleNameMapper: {
+    '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 };
