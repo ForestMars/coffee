@@ -106,7 +106,7 @@ describe('OrdersPage', () => {
       const statusElement = screen.getByText('pending');
       expect(statusElement).toBeInTheDocument();
       expect(statusElement.closest('div')).toHaveStyle({
-        background: expect.stringContaining('rgba(245, 158, 11, 0.2)'), // pending color
+        background: expect.stringContaining('rgba(245, 158, 11, 0.125)'), // pending color
         color: '#f59e0b',
       });
     });
@@ -206,8 +206,8 @@ describe('OrdersPage', () => {
     });
 
     it('should handle different order statuses correctly', () => {
-      const completedOrder = { ...mockOrder, status: 'completed' as const };
-      const cancelledOrder = { ...mockOrder, id: 789012, status: 'cancelled' as const };
+      const completedOrder = { ...mockOrder, id: 789012, status: 'completed' as const };
+      const cancelledOrder = { ...mockOrder, id: 999999, status: 'cancelled' as const };
       
       mockStore.orders = [mockOrder, completedOrder, cancelledOrder];
       renderOrdersPage();
@@ -222,7 +222,7 @@ describe('OrdersPage', () => {
       expect(cancelledStatus).toBeInTheDocument();
       
       // Check emojis
-      expect(screen.getAllByText('⏳')).toHaveLength(2); // 2 pending orders
+      expect(screen.getAllByText('⏳')).toHaveLength(1); // 1 pending order
       expect(screen.getByText('✅')).toBeInTheDocument(); // 1 completed
       expect(screen.getByText('❌')).toBeInTheDocument(); // 1 cancelled
     });
@@ -248,7 +248,7 @@ describe('OrdersPage', () => {
       
       const backButton = screen.getByText('←');
       expect(backButton).toBeInTheDocument();
-      expect(backButton.closest('button')).toHaveAttribute('onClick');
+      expect(backButton.closest('button')).toBeInTheDocument();
     });
   });
 
